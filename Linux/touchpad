@@ -1,0 +1,40 @@
+# Отключить настройку тачпада из графической оболочки. Она затирает все остальные настройки.
+
+dconf-editor: 
+org/gnome/settings-daemon/plugins/mouse/active = 0
+
+# Посмотреть подключенные устройства:
+
+xinput
+
+# В списке бывает два тачпада. Для нормальной настройки надо убрать дублирование.
+
+echo "blacklist psmouse" >> /etc/modprobe.d/blacklist.conf
+sudo update-initramfs -u
+sudo reboot
+
+# Теперь можно делать натсройку тачпада 3-мя способами. 
+
+# 1
+synclient 
+synclient Opt=Val
+
+# 2
+xinput 
+xinput --list-props id-device
+xinput --set-prop id-device id-prop value
+
+# 3 - сохраняется после перезагрузки
+
+/etc/X11/xorg.conf.d/50-synaptics.conf
+
+`Section "InputClass"
+    Identifier "touchpad catchall"
+    Driver "synaptics"
+    MatchIsTouchpad "on"
+	MatchDevicePath "/dev/input/event*"
+
+	Option "Option name" "Value"
+	
+EndSection`
+
